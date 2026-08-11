@@ -1,9 +1,20 @@
+data "aws_vpc" "main" {
+  default = true
+}
+
+data "aws_subnets" "public" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.main.id]
+  }
+}
+
 resource "aws_eks_cluster" "eks" {
   name     = var.cluster_name
   role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
-    subnet_ids = var.subnet_ids
+    subnet_ids = data.aws_subnets.public.ids
   }
 
   depends_on = [

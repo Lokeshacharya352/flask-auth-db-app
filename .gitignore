@@ -4,3 +4,4 @@
 crash.log
 config.txt
 terraform.tfvars
+.env
