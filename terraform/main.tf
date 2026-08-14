@@ -11,6 +11,19 @@ data "aws_subnets" "public" {
   }
 }
 
+# Reads outputs from the eks-cluster/ stack's state file directly from S3 —
+# avoids manually copy-pasting the security group ID (which would go stale
+# if the cluster were ever recreated). Requires eks-cluster/ to have been
+# applied at least once already.
+
+data "terraform_remote_state" "eks" {
+  backend = "s3"
+  config = {
+    bucket = "flask-db-auth-app-tfstate-bucket"
+    key    = "eks/terraform.tfstate"
+    region = "us-east-2"
+  }
+}
 
 resource "aws_db_subnet_group" "default" {
   name       = "flask-db-subnet-group"
@@ -27,10 +40,11 @@ resource "aws_security_group" "db_sg" {
   vpc_id      = data.aws_vpc.main.id
 
   ingress {
+    description = "Allow MySQL access from EKS Nodes only"
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # tighten this later
+    security_groups = [data.terraform_remote_state.eks.outputs.cluster_security_group_id]
   }
 
   egress {

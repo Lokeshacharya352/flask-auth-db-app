@@ -5,3 +5,5 @@ crash.log
 config.txt
 terraform.tfvars
 .env
+secrets.yaml
+sealed-secrets-key-backup.yaml

@@ -1,0 +1,32 @@
+# This Ingress does NOTHING until the AWS Load Balancer Controller is
+# installed in the cluster (next step, requires IRSA set up first via
+# eks-cluster/'s new OIDC provider). Once the controller is running, it
+# watches for Ingress resources with ingressClassName: alb and provisions
+# a real AWS Application Load Balancer automatically.
+#
+# HTTPS/ACM certificate wiring is intentionally left out for now — we'll
+# add `alb.ingress.kubernetes.io/certificate-arn` once a domain + ACM cert
+# are ready. For now this serves plain HTTP so we can verify the ALB path
+# end-to-end first.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flask-ingress
+  namespace: flask
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: flask-service
+                port:
+                  number: 80

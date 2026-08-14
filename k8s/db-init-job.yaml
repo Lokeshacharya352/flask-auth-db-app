@@ -1,0 +1,42 @@
+# k8s/db-init-job.yaml
+#
+# Runs once, connects to RDS using the SAME Secret the Flask app already
+# reads from (flask-secret / sealed-secret.yaml) - no separate credentials
+# to manage. Safe to re-run on every deploy since init.sql is idempotent
+# (CREATE TABLE IF NOT EXISTS).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-init
+  namespace: flask
+  annotations:
+    # Runs BEFORE ArgoCD syncs the rest of the app's resources on every
+    # sync operation, and gets deleted automatically once it succeeds -
+    # this stops ArgoCD from treating a self-cleaning Job as permanent
+    # drift (which would otherwise cause it to be recreated in a loop).
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  backoffLimit: 3 
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: db-init
+          image: mysql:8.0
+          command:
+            - sh
+            - -c
+            - |
+              mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DB" < /scripts/init.sql
+          envFrom:
+            - secretRef:
+                name: flask-secret
+          volumeMounts:
+            - name: init-sql
+              mountPath: /scripts
+      volumes:
+        - name: init-sql
+          configMap:
+            name: db-init-sql
+ 

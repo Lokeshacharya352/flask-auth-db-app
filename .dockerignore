@@ -1,0 +1,37 @@
+# Version control
+.git
+.gitignore
+
+# Terraform (provider binaries in .terraform/ can be hundreds of MB each,
+# and there are three separate stacks in this repo)
+terraform/
+terraform-backend/
+eks-cluster/
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform.lock.hcl
+
+# Kubernetes manifests / GitOps — not needed inside the image
+k8s/
+argocd/
+.github/
+
+# Python local dev artifacts
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Env / secrets — never bake these into an image
+.env
+*.env
+
+# Docs
+README.md
+*.md
+
+# Editor
+.vscode/
+.idea/

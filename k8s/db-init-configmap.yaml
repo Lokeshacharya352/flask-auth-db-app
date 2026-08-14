@@ -1,0 +1,20 @@
+# k8s/db-init-configmap.yaml
+#
+# The SQL itself has nothing sensitive in it (just schema, no data/creds),
+# so unlike secrets.yaml this is safe to commit directly - no .example
+# placeholder needed.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-init-sql
+  namespace: flask
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS users (
+        id         INT AUTO_INCREMENT PRIMARY KEY,
+        name       VARCHAR(100) NOT NULL,
+        email      VARCHAR(100) NOT NULL UNIQUE,
+        password   VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+ 

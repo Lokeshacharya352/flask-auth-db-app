@@ -1,0 +1,30 @@
+# argocd/application.yaml
+#
+# This is applied ONCE, directly to the argocd namespace (not part of the
+# app's own k8s/ folder that ArgoCD syncs - this IS the thing that tells
+# ArgoCD what to sync). After this exists, pushing changes to k8s/ in git
+# is enough to update the cluster - no manual kubectl apply needed for
+# app resources ever again.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: flask-db-auth-app
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/Lokeshacharya352/flask-auth-db-app.git
+    targetRevision: main
+    path: k8s
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: flask
+
+  syncPolicy:
+    automated:
+      prune: true      # removes resources from the cluster if deleted from git
+      selfHeal: true    # reverts manual kubectl edits back to match git
+    syncOptions:
+      - CreateNamespace=true
