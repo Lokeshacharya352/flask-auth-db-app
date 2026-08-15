@@ -2,6 +2,9 @@ from flask import Flask
 from flask_mysqldb import MySQL
 from dotenv import load_dotenv
 import os
+from prometheus_flask_exporter import PrometheusMetrics
+
+metrics = PrometheusMetrics(app)
 
 load_dotenv()
 

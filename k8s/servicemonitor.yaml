@@ -1,0 +1,28 @@
+# k8s/servicemonitor.yaml
+#
+# IMPORTANT GOTCHA: the "release" label below MUST match the Helm release
+# name you installed kube-prometheus-stack with (e.g. `helm install
+# kube-prometheus-stack prometheus-community/kube-prometheus-stack ...`
+# means the release name is "kube-prometheus-stack"). By default, the
+# Prometheus instance is configured to ONLY pick up ServiceMonitors
+# carrying this exact label - without it, this ServiceMonitor exists in
+# the cluster but gets silently ignored, with no error anywhere. Adjust
+# the value below if you used a different release name.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: flask-app-monitor
+  namespace: flask
+  labels:
+    release: kube-prometheus-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - flask
+  selector:
+    matchLabels:
+      app: flask-app
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
