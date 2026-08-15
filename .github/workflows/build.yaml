@@ -33,9 +33,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 
-  build-and-deploy:
+  build-and-Update-k8s-manifest:
     needs: sonarqube
-    name: Build Docker image and Deploy to EKS
+    name: Build Docker image and Push
     runs-on: ubuntu-latest
 
     steps:
