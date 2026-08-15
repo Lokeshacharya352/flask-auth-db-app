@@ -92,7 +92,7 @@ resource "aws_eks_node_group" "node_group" {
   subnet_ids      = aws_eks_cluster.eks.vpc_config[0].subnet_ids
 
   scaling_config {
-    desired_size = 2
+    desired_size = 1
     max_size     = 3
     min_size     = 1
   }
