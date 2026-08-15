@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: flask-app
-          image: lucky352/flask-auth-db-app-version-2:fc07f49
+          image: lucky352/flask-auth-db-app-version-2:eabcd52
           ports:
             - containerPort: 5000
           envFrom:
