@@ -1,0 +1,33 @@
+# k8s/flask-app-alerts.yaml
+#
+# Same gotcha as the ServiceMonitor earlier: the "release" label MUST match
+# your Helm release name (kube-prometheus-stack), or Prometheus silently
+# ignores this rule with no error anywhere.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: flask-app-alerts
+  namespace: flask
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: flask-app.rules
+      rules:
+        - alert: FlaskHigh5xxErrorRate
+          expr: sum(rate(flask_http_request_duration_seconds_count{status=~"5..", namespace="flask"}[5m])) > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Flask app is returning 5xx errors"
+            description: "The Flask app has had a non-zero 5xx error rate for 5+ minutes."
+
+        - alert: FlaskPodRestartingFrequently
+          expr: increase(kube_pod_container_status_restarts_total{namespace="flask"}[15m]) > 3
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Pod {{ $labels.pod }} is restarting frequently"
+            description: "{{ $labels.pod }} has restarted more than 3 times in the last 15 minutes."

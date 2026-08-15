@@ -7,3 +7,4 @@ terraform.tfvars
 .env
 secrets.yaml
 sealed-secrets-key-backup.yaml
+alertmanager-values.yaml
