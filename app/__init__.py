@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 from prometheus_flask_exporter import PrometheusMetrics
 
-metrics = PrometheusMetrics(app)
+
 
 load_dotenv()
 
@@ -20,5 +20,6 @@ app.config['MYSQL_PASSWORD'] = os.getenv("MYSQL_PASSWORD")
 app.config['MYSQL_DB'] = os.getenv("MYSQL_DB")
 
 mysql = MySQL(app)
+metrics = PrometheusMetrics(app)
 
 from app import routes
